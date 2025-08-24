@@ -18,34 +18,29 @@ public class Garcom extends Thread {
     @Override
     public void run() {
         try {
-            // 1) Tentar bloquear o primeiro ingrediente
+            // Pega o primeiro ingrediente
             waitEnter("[" + getName() + "] tentando bloquear " + primeiroIngrediente.getNome());
             if (!chef.solicitarBloqueio(this, primeiroIngrediente, TipoBloqueio.exclusivo)) {
                 System.out.println("[" + getName() + "] não conseguiu bloquear " + primeiroIngrediente.getNome());
                 return;
             }
-
-            // Pausa para garantir que outro garçom pegue seu primeiro ingrediente
             waitEnter("[" + getName() + "] pegou " + primeiroIngrediente.getNome() +
-                    " (pressione Enter para continuar antes do segundo ingrediente)");
+                      " (pressione Enter para continuar antes do segundo ingrediente)");
 
-            long start = System.currentTimeMillis();
-            boolean avisoMostrado = false;
+            // Tenta pegar o segundo ingrediente
+            if (!chef.solicitarBloqueio(this, segundoIngrediente, TipoBloqueio.exclusivo)) {
+                System.out.println("[" + getName() + "] bloqueio negado para " + segundoIngrediente.getNome() +
+                        ", esperando intervenção do Chef...");
+                Thread.sleep(500);
 
-            // 2) Tentar bloquear o segundo ingrediente (pode gerar deadlock)
-            while (!chef.solicitarBloqueio(this, segundoIngrediente, TipoBloqueio.exclusivo)) {
-                if (!avisoMostrado) {
-                    System.out.println("[" + getName() + "] bloqueio negado para " + segundoIngrediente.getNome() + ", aguardando...");
-                    avisoMostrado = true;
-                }
-                Thread.sleep(50);
+                // Chef intervém liberando apenas os bloqueios necessários para resolver deadlock
+                System.out.println(">>> CHEF INTERVEM: Deadlock detectado para " + getName());
+                chef.resolverDeadlock(); // novo método para liberar bloqueios de forma segura
 
-                if (System.currentTimeMillis() - start > 500) {
-                    System.out.println(">>> CHEF INTERVEM: Deadlock detectado para " + getName());
-                    chef.liberarBloqueios(this);
-                    Thread.sleep(50);
-                    chef.solicitarBloqueio(this, primeiroIngrediente, TipoBloqueio.exclusivo);
-                    avisoMostrado = false; // reset
+                // Tenta o segundo ingrediente **apenas uma vez após intervenção**
+                if (!chef.solicitarBloqueio(this, segundoIngrediente, TipoBloqueio.exclusivo)) {
+                    System.out.println("[" + getName() + "] ainda não conseguiu o segundo ingrediente, abortando pedido.");
+                    return;
                 }
             }
 
