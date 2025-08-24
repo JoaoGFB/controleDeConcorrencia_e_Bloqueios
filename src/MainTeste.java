@@ -1,35 +1,31 @@
 package src;
 
 public class MainTeste {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         ChefDeCozinha chef = new ChefDeCozinha();
-        //criando garçons
-        Garcom g1 = new Garcom("João");
-        Garcom g2 = new Garcom("Maria");
 
-        //criando comidas
-        Pedido i1 = new Pedido("Carne", 1);
-        Pedido i2 = new Pedido("Batata", 2);
+        Pedido salmao = new Pedido("Salmão", 1);
+        Pedido limao  = new Pedido("Limão", 1);
 
-        //João pede bloqueio exclusivo na Carne
-        chef.solicitarBloqueio(g1, i1, TipoBloqueio.exclusivo);
+        // Carlos pega Salmão primeiro, depois Limão
+        Garcom carlos = new Garcom("Carlos", chef, salmao, limao);
 
-        //Maria tenta pegar bloqueio compartilhado na Carne (não pode, pq já tá exclusivo)
-        chef.solicitarBloqueio(g2, i1, TipoBloqueio.compartilhado);
+        // Ana pega Limão primeiro, depois Salmão
+        Garcom ana    = new Garcom("Ana", chef, limao, salmao);
 
-        //Maria pede bloqueio compartilhado na Batata (vai funcionar)
-        chef.solicitarBloqueio(g2, i2, TipoBloqueio.compartilhado);
+        System.out.println("=== Cenário de Deadlock controlado para apresentação ===");
+        System.out.println("Carlos tenta pegar Salmão e depois Limão");
+        System.out.println("Ana tenta pegar Limão e depois Salmão\n");
 
-        //João pede bloqueio compartilhado na Batata (funciona tbm, pq já é compartilhado)
-        chef.solicitarBloqueio(g1, i2, TipoBloqueio.compartilhado);
+        // Inicia as threads
+        carlos.start();
+        ana.start();
 
-        //liberar os bloqueios de Maria
-        chef.liberarBloqueios(g2);
+        carlos.join();
+        ana.join();
 
-        //João tenta pedir bloqueio exclusivo na Batata (agora deve funcionar pq só ele tem compartilhado)
-        chef.solicitarBloqueio(g1, i2, TipoBloqueio.exclusivo);
-
-        //liberar os bloqueios de João
-        chef.liberarBloqueios(g1);
+        System.out.println("\n--- Estoque final ---");
+        System.out.println(salmao.getNome() + ": " + salmao.getQuantidade());
+        System.out.println(limao.getNome() + ": " + limao.getQuantidade());
     }
 }
