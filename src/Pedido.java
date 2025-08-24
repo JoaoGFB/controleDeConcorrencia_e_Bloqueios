@@ -1,19 +1,19 @@
 package src;
 
 public class Pedido {
-    private String nome;
+    private final String nome;
     private int quantidade;
 
     public Pedido(String nome, int quantidade) {
-        this.setNome(nome);
-        this.setQuantidade(quantidade);
+        this.nome = nome;
+        this.quantidade = quantidade;
     }
 
-    public void consumir(int qtd) {
-        if (qtd <= this.quantidade) {
-            this.quantidade -= qtd;
+    public synchronized void consumir(int qtd) {
+        if (qtd <= quantidade) {
+            quantidade -= qtd;
         } else {
-            throw new IllegalStateException("Ingrediente insuficiente: " + this.nome);
+            throw new IllegalStateException("Ingrediente insuficiente: " + nome);
         }
     }
 
@@ -21,15 +21,7 @@ public class Pedido {
         return nome;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
     public int getQuantidade() {
         return quantidade;
-    }
-
-    public void setQuantidade(int quantidade) {
-        this.quantidade = quantidade;
     }
 }
