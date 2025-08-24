@@ -1,27 +1,31 @@
 package src;
 
-enum TipoBloqueio {
-    compartilhado,
-    exclusivo
-}
-
 public class Bloqueio {
-    private Pedido recurso;
-    private TipoBloqueio tipo;
-    private String dono; // Nome do garçom
+    private final Pedido recurso;
+    private final TipoBloqueio tipo;
+    private final String dono;
 
     public Bloqueio(Pedido recurso, TipoBloqueio tipo, String dono) {
-        this.setRecurso(recurso);
-        this.setTipo(tipo);
-        this.setDono(dono);
+        this.recurso = recurso;
+        this.tipo = tipo;
+        this.dono = dono;
     }
 
     public boolean eCompativel(TipoBloqueio novoTipo, String novoDono) {
-        if (this.dono.equals(novoDono))
-            return true;
-        if (this.tipo == TipoBloqueio.compartilhado && novoTipo == TipoBloqueio.compartilhado)
-            return true;
-        return false;
+        if (dono.equals(novoDono)) return true;
+        return tipo == TipoBloqueio.compartilhado && novoTipo == TipoBloqueio.compartilhado;
+    }
+
+    public Pedido getRecurso() {
+        return recurso;
+    }
+
+    public TipoBloqueio getTipo() {
+        return tipo;
+    }
+
+    public String getDono() {
+        return dono;
     }
 
     @Override
@@ -31,24 +35,5 @@ public class Bloqueio {
                 ", tipo=" + tipo +
                 ", dono='" + dono + '\'' +
                 '}';
-    }
-
-    public Pedido getRecurso() {
-        return recurso;
-    }
-    public void setRecurso(Pedido recurso) {
-        this.recurso = recurso;
-    }
-    public TipoBloqueio getTipo() {
-        return tipo;
-    }
-    public void setTipo(TipoBloqueio tipo) {
-        this.tipo = tipo;
-    }
-    public String getDono() {
-        return dono;
-    }
-    public void setDono(String dono) {
-        this.dono = dono;
     }
 }
