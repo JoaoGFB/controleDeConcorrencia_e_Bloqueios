@@ -7,17 +7,11 @@ public class MainTeste {
         Pedido salmao = new Pedido("Salmão", 1);
         Pedido limao  = new Pedido("Limão", 1);
 
-        // Carlos pega Salmão primeiro, depois Limão
         Garcom carlos = new Garcom("Carlos", chef, salmao, limao);
-
-        // Ana pega Limão primeiro, depois Salmão
         Garcom ana    = new Garcom("Ana", chef, limao, salmao);
 
-        System.out.println("=== Cenário de Deadlock controlado para apresentação ===");
-        System.out.println("Carlos tenta pegar Salmão e depois Limão");
-        System.out.println("Ana tenta pegar Limão e depois Salmão\n");
+        System.out.println("=== Cenário de Deadlock controlado para apresentação ===\n");
 
-        // Inicia as threads
         carlos.start();
         ana.start();
 
