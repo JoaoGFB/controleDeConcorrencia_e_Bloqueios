@@ -7,28 +7,25 @@ import java.util.List;
 public class ChefDeCozinha {
     private final List<Bloqueio> bloqueios = new ArrayList<>();
 
-    public boolean solicitarBloqueio(Garcom garcom, Pedido ingredientes, TipoBloqueio tipo) {
+    public synchronized boolean solicitarBloqueio(Garcom garcom, Pedido ingrediente, TipoBloqueio tipo) {
         Iterator<Bloqueio> it = bloqueios.iterator();
         while (it.hasNext()) {
             Bloqueio b = it.next();
-            if (b.getRecurso().equals(ingredientes)) {//verifica se o ingrediente está bloqueado
-                if (!b.eCompativel(tipo, garcom.getNome())) {//verifica se o tipo é compatível
-                    System.out.println("Bloqueio negado para "+garcom.getNome()+
-                            " em "+ingredientes.getNome()+" (já está com "+b.getTipo()+" por "+b.getDono()+")");
-                    return false;//caso esteja bloqueado e o tipo é imcompatível o bloqueio é negado
+            if (b.getRecurso().equals(ingrediente)) {
+                if (!b.eCompativel(tipo, garcom.getName())) {
+                    return false; // apenas retorna false sem imprimir
                 }
             }
-        }//caso contrário cria um novo bloqueio
-        Bloqueio novo = new Bloqueio(ingredientes, tipo, garcom.getNome());
+        }
+        Bloqueio novo = new Bloqueio(ingrediente, tipo, garcom.getName());
         bloqueios.add(novo);
-        System.out.println("Bloqueio "+tipo+" concedido para "+garcom.getNome() + " em "+ingredientes.getNome());
+        System.out.println("Bloqueio " + tipo + " concedido para " + garcom.getName() +
+                " em " + ingrediente.getNome());
         return true;
     }
 
-    public void liberarBloqueios(Garcom garcom) {
-        System.out.println("Liberando bloqueios de "+garcom.getNome()+"...");
-        System.out.println("Antes: "+this.bloqueios);
-        bloqueios.removeIf(b -> b.getDono().equals(garcom.getNome()));
-        System.out.println("Depois: "+this.bloqueios);
+    public synchronized void liberarBloqueios(Garcom garcom) {
+        bloqueios.removeIf(b -> b.getDono().equals(garcom.getName()));
+        System.out.println("Chef liberou todos os bloqueios de " + garcom.getName());
     }
 }
